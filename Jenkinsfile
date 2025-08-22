@@ -33,24 +33,17 @@ pipeline {
             steps {
 
             sh """
-                echo ${IMAGE_NAME}
-                docker tag ${IMAGE_NAME} $DOCKER_USER/flask-app:latest
+            echo ${IMAGE_NAME}
             """
 
-
-            docker.withRegistry('https://registry.hub.docker.com', 'basaraksu-dockerhub') {            
+            withCredentials([usernamePassword(credentialsId: 'basaraksu-dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                sh 'echo $DOCKER_USER'
                 sh """
+                    # echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                    docker tag ${IMAGE_NAME} $DOCKER_USER/flask-app:latest
                     docker push $DOCKER_USER/flask-app:latest
-                """
+                    """
             }
-
-            // withCredentials([usernamePassword(credentialsId: "basaraksu-dockerhub")]) {
-            //     sh """
-            //         # echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-            //         docker tag ${IMAGE_NAME} $DOCKER_USER/flask-app:latest
-            //         docker push $DOCKER_USER/flask-app:latest
-            //         """
-            // }
         }
 }   
 
