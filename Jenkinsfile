@@ -31,12 +31,17 @@ pipeline {
         }
         stage('Push to Docker Hub') {
             steps {
-        withCredentials([usernamePassword(credentialsId: 'basaraksu-dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-            sh '''
-                echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-                docker tag flask-app $DOCKER_USER/flask-app:latest
-                docker push $DOCKER_USER/flask-app:latest
-            '''
+
+            sh """
+            echo ${IMAGE_NAME}
+            """
+
+            withCredentials([usernamePassword(credentialsId: 'basaraksu-dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                sh """
+                    # echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                    docker tag ${IMAGE_NAME} $DOCKER_USER/flask-app:latest
+                    docker push $DOCKER_USER/flask-app:latest
+                    """
             }
         }
 }   
