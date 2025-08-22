@@ -36,7 +36,7 @@ pipeline {
             echo ${IMAGE_NAME}
             """
 
-            withCredentials([usernamePassword(credentialsId: 'basaraksu-dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+            withCredentials([usernamePassword(credentialsId: "basaraksu-dockerhub")]) {
                 sh """
                     # echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
                     docker tag ${IMAGE_NAME} $DOCKER_USER/flask-app:latest
