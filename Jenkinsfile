@@ -14,6 +14,15 @@ pipeline {
                 echo 'Jenkins starts!'
             }
         }
+
+        stage('SonarQube Analysis') {
+            def scannerHome = tool 'SonarScanner';
+            withSonarQubeEnv('sonarqube') {
+            sh "${scannerHome}/bin/sonar-scanner"
+            }
+        }
+
+
         stage('Cleanup Container') {
             steps {
         sh """
@@ -50,13 +59,20 @@ pipeline {
             withCredentials([usernamePassword(credentialsId: 'basaraksu-dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                 sh 'echo $DOCKER_USER'
                 sh """
-                    # echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
                     docker tag ${IMAGE_NAME} $DOCKER_USER/flask-app:latest
                     docker push $DOCKER_USER/flask-app:latest
                     """
             }
         }
-}   
+    }   
+        post {
+            failure {
+                echo 'Pipeline failed. No deployment triggered.'
+            }
+            success {
+                echo 'Pipeline succeeded. Deployment completed.'
+            }
+    }
 
     }
 }
