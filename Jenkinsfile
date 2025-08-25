@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = 'myapp'
+        IMAGE_NAME = 'myapp-i'
         CONTAINER_NAME = 'myapp-c'
         PORT = '5000'
     }
@@ -14,21 +14,32 @@ pipeline {
                 echo 'Jenkins starts!'
             }
         }
-        stage('Build Docker Image') {
+        stage('Cleanup Container') {
             steps {
-                sh "docker build -t ${IMAGE_NAME} ."
+        sh """
+            docker stop ${CONTAINER_NAME} || true
+            docker rm ${CONTAINER_NAME} || true
+        """
             }
         }
 
+        stage('Build Docker Image') {
+            steps {
+        sh """
+            docker rmi ${IMAGE_NAME} || true
+            docker build -t ${IMAGE_NAME} .
+        """
+            }
+    }
+
         stage('Run Container') {
             steps {
-                sh """
-                    docker stop ${CONTAINER_NAME} || true
-                    docker rm ${CONTAINER_NAME} || true
-                    docker run --name ${CONTAINER_NAME} -p ${PORT}:${PORT} -d ${IMAGE_NAME}
-                """
+        sh """
+            docker run --name ${CONTAINER_NAME} -p ${PORT}:${PORT} -d ${IMAGE_NAME}
+        """
             }
-        }
+    }
+
         stage('Push to Docker Hub') {
             steps {
 
