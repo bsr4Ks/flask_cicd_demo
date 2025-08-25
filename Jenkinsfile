@@ -1,15 +1,10 @@
 pipeline {
     agent any
 
-    tools {
-        sonarQube 'SonarScanner' // Must match the name in Jenkins > Global Tool Configuration
-    }
-
     environment {
         IMAGE_NAME = 'myapp-i'
         CONTAINER_NAME = 'myapp-c'
         PORT = '5000'
-        SCANNER_HOME = tool 'SonarScanner'
     }
 
     stages {
@@ -21,8 +16,11 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('sonarqube') { // Must match Jenkins > SonarQube server name
-                    sh "${SCANNER_HOME}/bin/sonar-scanner"
+                script {
+                    def scannerHome = tool name: 'SonarScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+                    withSonarQubeEnv('sonarqube') {
+                        sh "${scannerHome}/bin/sonar-scanner"
+                    }
                 }
             }
         }
