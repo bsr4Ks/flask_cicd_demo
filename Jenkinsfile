@@ -11,9 +11,9 @@ pipeline {
         stage('Start') {
             steps {
                 echo 'Jenkins starts!'
-                sh "docker pull python:3.12-slim"
-                sh "docker run -d --name python-c python:3.12-slim"
-                sh "python --version"
+                sh "python3 -m venv venv"
+                sh "source venv/bin/activate"
+                sh "pip3 install -r requirements.txt"
             }
         }
 
@@ -28,13 +28,13 @@ pipeline {
             }
         }
 
-        /*stage('Test') {
+        stage('Test') {
             steps {
             sh """
             pytest tests/ --junitxml=report.xml
             """
         }
-        }*/
+        }
         stage('Cleanup Container') {
             steps {
                 sh """
