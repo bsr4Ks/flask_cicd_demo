@@ -30,7 +30,7 @@ pipeline {
         stage('Test') {
             steps {
             sh """
-            pytest tests/ --junitxml=report.xml
+            ./venv/bin/pytest tests/ --junitxml=report.xml
             """
         }
         }
