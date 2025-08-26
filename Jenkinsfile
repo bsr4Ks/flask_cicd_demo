@@ -30,7 +30,7 @@ pipeline {
             sh "pytest tests/ --junitxml=report.xml"
             junit 'report.xml'
         }
-
+        }
         stage('Cleanup Container') {
             steps {
                 sh """
