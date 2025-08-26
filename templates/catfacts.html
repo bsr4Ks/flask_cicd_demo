@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h3>Catfacts | <a href={{ url_for('index') }}>back</a> </h3>
+    {% if fact %}
+        <p>{{ fact }}</p>
+    {% else %}
+        <p>No fact yet. Click the button to fetch one!</p>
+    {% endif %}
+
+    <form method="POST">
+        <button type="submit">Get Cat Fact</button>
+    </form>
+{% endblock %}

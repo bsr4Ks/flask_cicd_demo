@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h3>Dogimages | <a href={{ url_for('index') }}>back</a> </h3>
+    {% if image_url %}
+        <img src="{{ image_url }}" alt="Random Dog" style="max-width:500px;">
+    {% else %}
+        <p>No image yet. Click the button to fetch one!</p>
+    {% endif %}
+
+    <form method="POST">
+        <button type="submit">Fetch Dog Image</button>
+    </form>
+{% endblock %}

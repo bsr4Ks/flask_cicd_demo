@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <p>Hello from CI/CD Pipeline! With Jenkins that is triggered by POLL SCM! It passed the tests of SonarQube!!</p>    
+    <p>Hello from CI/CD Pipeline! With Jenkins that is triggered by POLL SCM! It passed the tests of SonarQube!!</p>  
+    <h2><a href={{ url_for('catfacts') }}>CAT FACTS</a> or <a href={{ url_for('dogimages') }}>DOG IMAGES</a></h2>  
 {% endblock %}
