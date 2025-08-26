@@ -11,7 +11,8 @@ pipeline {
         stage('Start') {
             steps {
                 echo 'Jenkins starts!'
-                sh "pip3 install -r requirements.txt"
+                sh "python3 -m venv venv"
+                sh "venv/bin/pip3 install -r requirements.txt"
             }
         }
 
