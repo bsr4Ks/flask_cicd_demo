@@ -1,31 +1,49 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session
 from dotenv import load_dotenv
-from login import login_bp
+from functools import wraps
 import requests
 import os
 
-
 app = Flask(__name__)
 load_dotenv()
-app.secret_key = os.getenv("FLASK_SECRET_KEY")
-app.register_blueprint(login_bp)
+app.secret_key = os.environ.get('FLASK_SECRET_KEY')
 
+users = {'admin': 'secret'}
 
-def session(user):
-    if not user:
-        return redirect(url_for("login"))
+# Decorator to enforce login
+def require_login(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get('user'):
+            return redirect(url_for("login"))
+        return f(*args, **kwargs)
+    return decorated_function
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        if username in users and users[username] == password:
+            session['user'] = username
+            return redirect(url_for('index'))
+        return "Invalid credentials", 401
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    session.pop('user', None)
+    return redirect(url_for('login'))
 
 @app.route('/')
+@require_login
 def index():
-    session(session.get('user'))
-    return render_template("home.html", user=user)
-
+    return render_template("home.html", user=session.get('user'))
 
 @app.route('/catfacts', methods=['GET', 'POST'])
+@require_login
 def catfacts():
-    session(session.get('user'))
     fact = None
-
     if request.method == "POST":
         try:
             response = requests.get("https://catfact.ninja/fact", verify=False)
@@ -33,15 +51,12 @@ def catfacts():
             fact = data.get("fact")
         except Exception as e:
             print(f"Error fetching cat fact: {e}")
-
     return render_template("catfacts.html", fact=fact)
 
-
 @app.route('/dogimages', methods=['POST', 'GET'])
+@require_login
 def dogimages():
-    session(session.get('user'))
     image_url = None
-
     if request.method == "POST":
         try:
             response = requests.get("https://dog.ceo/api/breeds/image/random", verify=False)
@@ -50,7 +65,6 @@ def dogimages():
                 image_url = data["message"]
         except Exception as e:
             print(f"Error fetching dog image: {e}")
-
     return render_template("dogimages.html", image_url=image_url)
 
 if __name__ == '__main__':
