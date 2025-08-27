@@ -1,14 +1,29 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
+from dotenv import load_dotenv
+from login import login_bp
 import requests
+import os
+
+
 app = Flask(__name__)
+load_dotenv()
+app.secret_key = os.getenv("FLASK_SECRET_KEY")
+app.register_blueprint(login_bp)
+
+
+def session(user):
+    if not user:
+        return redirect(url_for("login"))
 
 @app.route('/')
 def index():
-    return render_template("home.html")
+    session(session.get('user'))
+    return render_template("home.html", user=user)
 
 
 @app.route('/catfacts', methods=['GET', 'POST'])
 def catfacts():
+    session(session.get('user'))
     fact = None
 
     if request.method == "POST":
@@ -24,6 +39,7 @@ def catfacts():
 
 @app.route('/dogimages', methods=['POST', 'GET'])
 def dogimages():
+    session(session.get('user'))
     image_url = None
 
     if request.method == "POST":
