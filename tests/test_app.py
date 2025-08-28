@@ -4,8 +4,6 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 from app import app
 from unittest.mock import patch
 
-FLASK_SECRET_KEY=fbb60b6a4c8b457f061f60098608e8cce718c45b5c2db279
-app.secret_key = FLASK_SECRET_KEY
 
 
 def login(client, username='admin', password='secret'):
