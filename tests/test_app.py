@@ -10,6 +10,11 @@ def login(client, username='admin', password='secret'):
         'password': password
     }, follow_redirects=True)
 
+@pytest.fixture
+def client():
+    app.config['TESTING'] = True
+    with app.test_client() as client:
+        yield client
 
 @pytest.fixture
 def logged_in_client(client):
