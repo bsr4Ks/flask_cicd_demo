@@ -16,7 +16,20 @@ pipeline {
             }
         }
 
+        stage('Info') {
+            steps {
+                echo "Building branch: ${env.BRANCH_NAME}"
+            }
+        }
+
         stage('SonarQube Analysis') {
+
+            when {
+                expression {
+                    return env.BRANCH_NAME == "dev" || env.BRANCH_NAME ==~ /^feature\/.+/
+                } 
+            }
+
             steps {
                 script {
                     def scannerHome = tool name: 'SonarScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
@@ -28,6 +41,13 @@ pipeline {
         }
 
         stage('Test') {
+
+            when {
+                expression {
+                    return env.BRANCH_NAME == "dev" || env.BRANCH_NAME ==~ /^feature\/.+/
+                } 
+            }
+
             steps {
             sh """
             ./venv/bin/pytest tests/ --junitxml=report.xml
@@ -35,6 +55,14 @@ pipeline {
         }
         }
         stage('Cleanup Container') {
+
+            when {
+                expression {
+                    return env.BRANCH_NAME == "dev"
+                } 
+            }
+
+
             steps {
                 sh """
                     docker stop ${CONTAINER_NAME} || true
@@ -44,6 +72,13 @@ pipeline {
         }
 
         stage('Build Docker Image') {
+
+            when {
+                expression {
+                    return env.BRANCH_NAME == "dev"
+                } 
+            }
+
             steps {
                 sh """
                     docker rmi ${IMAGE_NAME} || true
@@ -53,6 +88,13 @@ pipeline {
         }
 
         stage('Run Container') {
+
+            when {
+                expression {
+                    return env.BRANCH_NAME == "dev"
+                } 
+            }
+
             steps {
                 sh """
                     docker run --name ${CONTAINER_NAME} -p ${PORT}:${PORT} -d ${IMAGE_NAME}
@@ -61,6 +103,13 @@ pipeline {
         }
 
         stage('Push to Docker Hub') {
+
+            when {
+                expression {
+                    return env.BRANCH_NAME == "main"
+                } 
+            }
+
             steps {
                 withCredentials([usernamePassword(credentialsId: 'basaraksu-dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     sh """
