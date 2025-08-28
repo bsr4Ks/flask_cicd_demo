@@ -5,8 +5,9 @@ import requests
 import os
 
 app = Flask(__name__)
-load_dotenv()
-app.secret_key = os.environ.get('FLASK_SECRET_KEY')
+
+FLASK_SECRET_KEY="fbb60b6a4c8b457f061f60098608e8cce718c45b5c2db279"
+app.secret_key = FLASK_SECRET_KEY
 
 users = {'admin': 'secret'}
 
