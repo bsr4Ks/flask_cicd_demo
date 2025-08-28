@@ -106,7 +106,7 @@ pipeline {
 
             when {
                 expression {
-                    return env.BRANCH_NAME == "main"
+                    return env.BRANCH_NAME == "main" || env.BRANCH_NAME == "deploy"
                 } 
             }
 
@@ -119,6 +119,15 @@ pipeline {
                 }
             }
         }
+
+        stage('Push Tagged Release to Docker Hub') {
+            when {
+                buildingTag()
+            }
+            steps {
+                echo "buildingtag"
+            }
+    }
     }
 
     post {
