@@ -1,13 +1,19 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>flask_cicd_demo</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
 </head>
+
 <body>
     <h1>Flask CI/CD DEMO</h1>
+    {% if session.get('user') %}
+    <a href="{{ url_for('logout') }}">Logout</a>
+    {% endif %}
     {% block content %}
-    
+
     {% endblock %}
 </body>
+
 </html>
