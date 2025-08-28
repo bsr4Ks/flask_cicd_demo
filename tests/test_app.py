@@ -4,32 +4,39 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 from app import app
 from unittest.mock import patch
 
-@pytest.fixture
-def client():
-    app.config['TESTING'] = True
-    with app.test_client() as client:
-        yield client
+def login(client, username='admin', password='secret'):
+    return client.post('/login', data={
+        'username': username,
+        'password': password
+    }, follow_redirects=True)
 
-def test_home_page(client):
-    response = client.get('/')
+
+@pytest.fixture
+def logged_in_client(client):
+    login(client)
+    return client
+
+
+def test_home_page(logged_in_client):
+    response = logged_in_client.get('/')
     assert response.status_code == 200
 
-def test_catfacts_get(client):
-    response = client.get('/catfacts')
+def test_catfacts_get(logged_in_client):
+    response = logged_in_client.get('/catfacts')
     assert response.status_code == 200
 
 
 @patch('requests.get')
-def test_catfacts_post(mock_get, client):
+def test_catfacts_post(mock_get, logged_in_client):
     mock_get.return_value.json.return_value = {"fact": "Cats purr to communicate."}
-    response = client.post('/catfacts')
+    response = logged_in_client.post('/catfacts')
     assert b"Cats purr to communicate." in response.data
 
 @patch('requests.get')
-def test_dogimages_post(mock_get, client):
+def test_dogimages_post(mock_get, logged_in_client):
     mock_get.return_value.json.return_value = {
         "status": "success",
         "message": "https://example.com/dog.jpg"
     }
-    response = client.post('/dogimages')
+    response = logged_in_client.post('/dogimages')
     assert b"https://example.com/dog.jpg" in response.data
