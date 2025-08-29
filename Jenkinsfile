@@ -37,7 +37,11 @@ pipeline {
             }
             
             steps {
-                echo "Detected tag: ${env.GIT_TAG_NAME}"
+                script {
+                    def tag = sh(script: "git describe --tags --exact-match || echo ''", returnStdout: true).trim()
+                    echo "Detected tag: ${tag}"
+                }
+
             }
         }
 
