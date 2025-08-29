@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         IMAGE_NAME = "basaraksu/flask-app"
-        CONTAINER_NAME = 'basaraksu/flask-app-c'
+        CONTAINER_NAME = 'basaraksu_flask-app_c'
         PORT = '5000'
         TAG_NAME = "${env.GIT_TAG_NAME ?: 'latest'}"
     }
