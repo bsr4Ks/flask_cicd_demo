@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = 'myapp-i'
-        CONTAINER_NAME = 'myapp-c'
+        IMAGE_NAME = "basaraksu/flask-app"
+        CONTAINER_NAME = 'basaraksu_flask-app_c'
         PORT = '5000'
     }
 
@@ -13,6 +13,7 @@ pipeline {
                 echo 'Jenkins starts!'
                 sh "python3 -m venv venv"
                 sh "venv/bin/pip3 install -r requirements.txt"
+                sh "echo $env.GIT_TAG_NAME"
             }
         }
 
@@ -106,19 +107,19 @@ pipeline {
 
             when {
                 expression {
-                    return env.BRANCH_NAME == "main"
+                    return env.BRANCH_NAME == "main" || env.BRANCH_NAME == "deploy"
                 } 
             }
 
             steps {
                 withCredentials([usernamePassword(credentialsId: 'basaraksu-dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     sh """
-                        docker tag ${IMAGE_NAME} $DOCKER_USER/flask-app:latest
-                        docker push $DOCKER_USER/flask-app:latest
+                        docker push ${IMAGE_NAME}
                     """
                 }
             }
         }
+
     }
 
     post {
