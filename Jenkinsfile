@@ -51,12 +51,11 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: 'basaraksu-dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                         sh """
                             # echo "${DOCKER_PASS}" | docker login -u "${DOCKER_USER}" --password-stdin
-                            docker push ${DOCKER_IMAGE}:${tag}
-                            docker logout
+                            docker push ${IMAGE_NAME}:${tag}
                         """
                     }
 
-                    echo "✅ Docker image ${DOCKER_IMAGE}:${TAG_NAME} pushed successfully."                
+                    echo "✅ Docker image ${IMAGE_NAME}:${TAG_NAME} pushed successfully."                
                 }
 
             }
