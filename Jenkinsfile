@@ -5,7 +5,6 @@ pipeline {
         IMAGE_NAME = "basaraksu/flask-app"
         CONTAINER_NAME = 'basaraksu_flask-app_c'
         PORT = '5000'
-        TAG_NAME = "${env.GIT_TAG_NAME ?: 'latest'}"
     }
 
     stages {
@@ -121,45 +120,6 @@ pipeline {
             }
         }
 
-        stage('Push Tagged Release to Docker Hub') {
-            when {
-                expression {
-                    return env.GIT_TAG_NAME != null
-                }
-            }
-
-            steps {
-                script {
-                    echo "Detected tag: ${env.GIT_TAG_NAME}"
-
-                    echo "🔖 Building Docker image for tag: ${TAG_NAME}"
-
-                    // Build image with tag
-                    sh """docker build -t ${IMAGE_NAME}:${TAG_NAME} ."""
-
-                    // Check if tag already exists on Docker Hub
-                    def tagExists = sh(
-                        script: "curl -s https://hub.docker.com/v2/repositories/${IMAGE_NAME}/tags/${TAG_NAME} | grep -q 'name'",
-                        returnStatus: true
-                    ) == 0
-
-                    if (tagExists) {
-                        error "❌ Docker tag '${TAG_NAME}' already exists on Docker Hub. Aborting to avoid overwrite."
-                    }   
-
-                    // Push image
-                    withCredentials([usernamePassword(credentialsId: 'basaraksu-dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    sh """
-                    # echo "${DOCKER_PASS}" | docker login -u "${DOCKER_USER}" --password-stdin
-                    docker push ${DOCKER_IMAGE}:${TAG_NAME}
-                    docker logout
-                    """
-                }
-
-                echo "✅ Docker image ${DOCKER_IMAGE}:${TAG_NAME} pushed successfully."
-        }
-    }
-}
     }
 
     post {
