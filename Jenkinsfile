@@ -2,9 +2,10 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = 'myapp-i'
-        CONTAINER_NAME = 'myapp-c'
+        IMAGE_NAME = "basaraksu/flask-app"
+        CONTAINER_NAME = 'basaraksu/flask-app-c'
         PORT = '5000'
+        TAG_NAME = "${env.GIT_TAG_NAME ?: 'latest'}"
     }
 
     stages {
@@ -113,8 +114,7 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'basaraksu-dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     sh """
-                        docker tag ${IMAGE_NAME} $DOCKER_USER/flask-app:latest
-                        docker push $DOCKER_USER/flask-app:latest
+                        docker push ${IMAGE_NAME}
                     """
                 }
             }
@@ -125,9 +125,35 @@ pipeline {
                 buildingTag()
             }
             steps {
-                echo "buildingtag"
-            }
+                script {
+                    echo "🔖 Building Docker image for tag: ${TAG_NAME}"
+
+                    // Build image with tag
+                    sh """docker build -t ${IMAGE_NAME}:${TAG_NAME} ."""
+
+                    // Check if tag already exists on Docker Hub
+                    def tagExists = sh(
+                        script: "curl -s https://hub.docker.com/v2/repositories/${IMAGE_NAME}/tags/${TAG_NAME} | grep -q 'name'",
+                        returnStatus: true
+                    ) == 0
+
+                    if (tagExists) {
+                        error "❌ Docker tag '${TAG_NAME}' already exists on Docker Hub. Aborting to avoid overwrite."
+                    }   
+
+                    // Push image
+                    withCredentials([usernamePassword(credentialsId: 'basaraksu-dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh """
+                    # echo "${DOCKER_PASS}" | docker login -u "${DOCKER_USER}" --password-stdin
+                    docker push ${DOCKER_IMAGE}:${TAG_NAME}
+                    docker logout
+                    """
+                }
+
+                echo "✅ Docker image ${DOCKER_IMAGE}:${TAG_NAME} pushed successfully."
+        }
     }
+}
     }
 
     post {
