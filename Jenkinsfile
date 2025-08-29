@@ -23,100 +23,11 @@ pipeline {
             }
         }
 
-        stage('SonarQube Analysis') {
-
-            when {
-                expression {
-                    return env.BRANCH_NAME == "dev" || env.BRANCH_NAME ==~ /^feature\/.+/
-                } 
-            }
-
-            steps {
-                script {
-                    def scannerHome = tool name: 'SonarScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
-                    withSonarQubeEnv('sonarqube') {
-                        sh "${scannerHome}/bin/sonar-scanner"
-                    }
-                }
-            }
-        }
-
-        stage('Test') {
-
-            when {
-                expression {
-                    return env.BRANCH_NAME == "dev" || env.BRANCH_NAME ==~ /^feature\/.+/
-                } 
-            }
-
-            steps {
-            sh """
-            ./venv/bin/pytest tests/ --junitxml=report.xml
-            """
-        }
-        }
-        stage('Cleanup Container') {
-
-            when {
-                expression {
-                    return env.BRANCH_NAME == "dev"
-                } 
-            }
-
-
+        stage('Push tagged release to Dockerhub') {
             steps {
                 sh """
-                    docker stop ${CONTAINER_NAME} || true
-                    docker rm ${CONTAINER_NAME} || true
+                    echo here!
                 """
-            }
-        }
-
-        stage('Build Docker Image') {
-
-            when {
-                expression {
-                    return env.BRANCH_NAME == "dev"
-                } 
-            }
-
-            steps {
-                sh """
-                    docker rmi ${IMAGE_NAME} || true
-                    docker build -t ${IMAGE_NAME} .
-                """
-            }
-        }
-
-        stage('Run Container') {
-
-            when {
-                expression {
-                    return env.BRANCH_NAME == "dev"
-                } 
-            }
-
-            steps {
-                sh """
-                    docker run --name ${CONTAINER_NAME} -p ${PORT}:${PORT} -d ${IMAGE_NAME}
-                """
-            }
-        }
-
-        stage('Push to Docker Hub') {
-
-            when {
-                expression {
-                    return env.BRANCH_NAME == "deploy"
-                } 
-            }
-
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'basaraksu-dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    sh """
-                        docker push ${IMAGE_NAME}
-                    """
-                }
             }
         }
 
