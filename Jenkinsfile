@@ -23,11 +23,20 @@ pipeline {
             }
         }
 
-        stage('Push tagged release to Dockerhub') {
+        stage('release') {
             steps {
                 sh """
                     echo here!
                 """
+            }
+        }
+        
+        stage('Push tagged release to Dockerhub') {
+            when {
+                buildingTag()
+            }
+            steps {
+                sh "actally here!"
             }
         }
 
