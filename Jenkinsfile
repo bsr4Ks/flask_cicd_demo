@@ -123,8 +123,11 @@ pipeline {
 
         stage('Push Tagged Release to Docker Hub') {
             when {
-                buildingTag()
+                expression {
+                    return env.GIT_TAG_NAME != null
+                }
             }
+
             steps {
                 script {
                     echo "Detected tag: ${env.GIT_TAG_NAME}"
