@@ -14,6 +14,7 @@ pipeline {
                 echo 'Jenkins starts!'
                 sh "python3 -m venv venv"
                 sh "venv/bin/pip3 install -r requirements.txt"
+                sh "echo $env.GIT_TAG_NAME"
             }
         }
 
@@ -126,6 +127,8 @@ pipeline {
             }
             steps {
                 script {
+                    echo "Detected tag: ${env.GIT_TAG_NAME}"
+
                     echo "🔖 Building Docker image for tag: ${TAG_NAME}"
 
                     // Build image with tag
