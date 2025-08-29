@@ -107,7 +107,7 @@ pipeline {
 
             when {
                 expression {
-                    return env.BRANCH_NAME == "main" || env.BRANCH_NAME == "deploy"
+                    return env.BRANCH_NAME == "deploy"
                 } 
             }
 
