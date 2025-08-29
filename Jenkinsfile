@@ -40,6 +40,30 @@ pipeline {
                 script {
                     def tag = sh(script: "git describe --tags --exact-match || echo ''", returnStdout: true).trim()
                     echo "Detected tag: ${tag}"
+                
+                    // Build image with tag
+                    sh """docker build -t ${IMAGE_NAME}:${tag} ."""
+
+                    // Check if tag already exists on Docker Hub
+                    def tagExists = sh(
+                        script: "curl -s https://hub.docker.com/v2/repositories/${IMAGE_NAME}/tags/${tag} | grep -q 'name'",
+                        returnStatus: true
+                    ) == 0
+
+                    if (tagExists) {
+                        error "❌ Docker tag '${TAG_NAME}' already exists on Docker Hub. Aborting to avoid overwrite."
+                    }   
+
+                    // Push image
+                    withCredentials([usernamePassword(credentialsId: 'basaraksu-dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                        sh """
+                            # echo "${DOCKER_PASS}" | docker login -u "${DOCKER_USER}" --password-stdin
+                            docker push ${DOCKER_IMAGE}:${tag}
+                            docker logout
+                        """
+                    }
+
+                    echo "✅ Docker image ${DOCKER_IMAGE}:${TAG_NAME} pushed successfully."                
                 }
 
             }
