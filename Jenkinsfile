@@ -35,9 +35,8 @@ pipeline {
             when {
                 buildingTag()
             }
-            steps {
-                sh "actally here!"
-            }
+            
+            echo "Detected tag: ${env.GIT_TAG_NAME}"
         }
 
         
