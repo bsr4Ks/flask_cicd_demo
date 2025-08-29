@@ -36,7 +36,9 @@ pipeline {
                 buildingTag()
             }
             
-            echo "Detected tag: ${env.GIT_TAG_NAME}"
+            steps {
+                echo "Detected tag: ${env.GIT_TAG_NAME}"
+            }
         }
 
         
