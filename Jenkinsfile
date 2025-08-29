@@ -103,23 +103,6 @@ pipeline {
             }
         }
 
-        stage('Push to Docker Hub') {
-
-            when {
-                expression {
-                    return env.BRANCH_NAME == "main" || env.BRANCH_NAME == "deploy"
-                } 
-            }
-
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'basaraksu-dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    sh """
-                        docker push ${IMAGE_NAME}
-                    """
-                }
-            }
-        }
-
     }
 
     post {
