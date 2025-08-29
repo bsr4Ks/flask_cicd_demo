@@ -46,9 +46,13 @@ pipeline {
 
                     // Check if tag already exists on Docker Hub
                     def tagExists = sh(
-                        script: "curl -s https://hub.docker.com/v2/repositories/${IMAGE_NAME}/tags/${tag} | grep -q 'name'",
+                        script: """
+                            STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://hub.docker.com/v2/repositories/${IMAGE_NAME}/tags/${tag})
+                            [ "$STATUS" -eq 200 ]
+                        """,
                         returnStatus: true
                     ) == 0
+
 
                     if (tagExists) {
                         error "❌ Docker tag '${TAG_NAME}' already exists on Docker Hub. Aborting to avoid overwrite."
