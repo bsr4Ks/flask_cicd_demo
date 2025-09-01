@@ -8,6 +8,6 @@
         msg: "hello, world! from {{ project_root }}"
 
     - name: Run test files
-      command: "{{ project_root }}/venv/bin/python -m pytest test/"
+      command: "{{ project_root }}/venv/bin/python -m pytest tests/"
       args:
         chdir: "{{ project_root }}"
