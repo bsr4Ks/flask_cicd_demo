@@ -4,7 +4,7 @@
 
   tasks:
     - name: Run pytest and capture output
-      command: "/venv/bin/pytest tests/ --tb=line"
+      command: "./venv/bin/pytest tests/ --tb=line"
       register: pytest_output
       args:
         chdir: "{{ project_root }}"
