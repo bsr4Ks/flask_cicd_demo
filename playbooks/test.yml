@@ -1,3 +1,3 @@
 - name: Run tests
-  ansible.builtindebug:
+  ansible.builtin.debug:
     msg: "hello, world"
