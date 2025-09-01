@@ -5,4 +5,4 @@
   tasks:
     - name: say hello
       debug:
-        msg: "hello, world!"
+        msg: "hello, world! from {{ project_root }}"
