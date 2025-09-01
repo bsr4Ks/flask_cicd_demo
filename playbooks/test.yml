@@ -1,3 +1,8 @@
-- name: Run tests
-  debug:
-    msg: "hello, world"
+- name: test
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: say hello
+      debug:
+        msg: "hello, world!"
