@@ -14,8 +14,8 @@ pipeline {
                 sh "python3 -m venv venv"
                 sh "venv/bin/pip3 install -r requirements.txt"
                 sh "echo $env.GIT_TAG_NAME"
-                sh "echo ansible --version"
-                sh "echo ansible-playbook --version" 
+                sh "ansible --version"
+                sh "ansible-playbook --version" 
             }
         }
 
