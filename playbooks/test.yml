@@ -4,11 +4,11 @@
 
   tasks:
     - name: Run pytest and capture output
-      command: "{{ project_root }}/venv/bin/pytest tests/ --tb=short -q"
+      command: "/venv/bin/pytest tests/ --tb=line"
       register: pytest_output
       args:
         chdir: "{{ project_root }}"
 
     - name: Show pytest results
       debug:
-        var: pytest_output.stdout_lines
+        msg: "results: {{ pytest_output.stdout_lines }}"
