@@ -6,6 +6,8 @@
     - name: Run pytest and capture output
       command: "{{ project_root }}/venv/bin/pytest tests/ --tb=short -q"
       register: pytest_output
+      args:
+        chdir: "{{ project_root }}"
 
     - name: Show pytest results
       debug:
