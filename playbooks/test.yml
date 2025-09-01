@@ -2,7 +2,7 @@
   hosts: localhost
   tasks:
     - name: Run pytest
-      command: pytest tests/
+      command: /venv/bin/pytest tests/
 
     - name: Run SonarQube
       command: sonar-scanner
