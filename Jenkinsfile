@@ -23,7 +23,13 @@ pipeline {
             steps {
                 echo "Building branch: ${env.BRANCH_NAME}"
             }
-        }   
+        }
+
+        stage('Test') {
+            sh "ansible-playbook playbooks/test.yml"
+        }
+
+
     }
 
     post {

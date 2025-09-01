@@ -1,0 +1,8 @@
+- name: Run tests
+  hosts: localhost
+  tasks:
+    - name: Run pytest
+      command: pytest tests/
+
+    - name: Run SonarQube
+      command: sonar-scanner
