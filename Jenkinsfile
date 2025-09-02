@@ -35,9 +35,9 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'basaraksu-harbor', usernameVariable: 'HARBOR_USER', passwordVariable: 'HARBOR_PASS')]) {
                     sh """
-                        docker login harbor.local.com -u $HARBOR_USER -p $HARBOR_PASS
-                        docker tag ${IMAGE_NAME}:latest harbor.local.com/devops-test/${IMAGE_NAME}:latest
-                        docker push harbor.local.com/devops-test/${IMAGE_NAME}:latest
+                        echo \$HARBOR_PASS | docker login harbor.local -u \$HARBOR_USER --password-stdin
+                        docker tag ${IMAGE_NAME}:latest harbor.local/devops-test/${IMAGE_NAME}:latest
+                        docker push harbor.local/devops-test/${IMAGE_NAME}:latest
                         docker logout harbor.local
                     """
                 }
