@@ -23,85 +23,30 @@ pipeline {
             }
         }
 
-        stage('SonarQube Analysis') {
+
+        stage('Push to Harbor') {
 
             when {
                 expression {
-                    return env.BRANCH_NAME == "dev" || env.BRANCH_NAME ==~ /^feature\/.+/
+                    return env.BRANCH_NAME == "dep-harbor"
                 } 
             }
 
             steps {
-                script {
-                    def scannerHome = tool name: 'SonarScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
-                    withSonarQubeEnv('sonarqube') {
-                        sh "${scannerHome}/bin/sonar-scanner"
-                    }
+                withCredentials([usernamePassword(credentialsId: 'basaraksu-harbor', usernameVariable: 'HARBOR_USER', passwordVariable: 'HARBOR_PASS')]) {
+                    sh """
+                        docker login harbor.local.com -u $HARBOR_USER -p $HARBOR_PASS
+                        docker tag ${IMAGE_NAME}:latest harbor.local.com/devops-test/${IMAGE_NAME}:latest
+                        docker push harbor.local.com/devops-test/${IMAGE_NAME}:latest
+                        docker logout harbor.local
+                    """
                 }
             }
         }
 
-        stage('Test') {
-
-            when {
-                expression {
-                    return env.BRANCH_NAME == "dev" || env.BRANCH_NAME ==~ /^feature\/.+/
-                } 
-            }
-
-            steps {
-            sh """
-            ./venv/bin/pytest tests/ --junitxml=report.xml
-            """
-        }
-        }
-        stage('Cleanup Container') {
-
-            when {
-                expression {
-                    return env.BRANCH_NAME == "dev"
-                } 
-            }
 
 
-            steps {
-                sh """
-                    docker stop ${CONTAINER_NAME} || true
-                    docker rm ${CONTAINER_NAME} || true
-                """
-            }
-        }
 
-        stage('Build Docker Image') {
-
-            when {
-                expression {
-                    return env.BRANCH_NAME == "dev"
-                } 
-            }
-
-            steps {
-                sh """
-                    docker rmi ${IMAGE_NAME} || true
-                    docker build -t ${IMAGE_NAME} .
-                """
-            }
-        }
-
-        stage('Run Container') {
-
-            when {
-                expression {
-                    return env.BRANCH_NAME == "dev"
-                } 
-            }
-
-            steps {
-                sh """
-                    docker run --name ${CONTAINER_NAME} -p ${PORT}:${PORT} -d ${IMAGE_NAME}
-                """
-            }
-        }
 
     }
 
